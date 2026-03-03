@@ -9,46 +9,52 @@
 @inject SignInManager<ApplicationUser> SignInManager
 @inject ILogger<Login> Logger
 @inject NavigationManager NavigationManager
-@inject IdentityRedirectManager RedirectManager
+@inject RedirectManager RedirectManager
+@inject StatusMessageService StatusMessage
 
 <PageTitle>Log in</PageTitle>
 
-<h1>Log in</h1>
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1">Log in</RadzenText>
 <div class="row">
     <div class="col-lg-6">
-        <section>
-            <StatusMessage Message="@errorMessage" />
-            <EditForm EditContext="editContext" method="post" OnSubmit="LoginUser" FormName="login">
+        <RadzenCard Variant="Variant.Flat" Class="rz-p-4 rz-p-lg-12">
+            <EditForm Enhance EditContext="editContext" method="post" OnSubmit="LoginUser" FormName="login">
                 <DataAnnotationsValidator />
-                <h2>Use a local account to log in.</h2>
-                <hr />
-                <ValidationSummary class="text-danger" role="alert" />
-                <div class="form-floating mb-3">
-                    <InputText @bind-Value="Input.Email" id="Input.Email" class="form-control" autocomplete="username webauthn" aria-required="true" placeholder="name@example.com" />
-                    <label for="Input.Email" class="form-label">Email</label>
-                    <ValidationMessage For="() => Input.Email" class="text-danger" />
-                </div>
-                <div class="form-floating mb-3">
-                    <InputText type="password" @bind-Value="Input.Password" id="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
-                    <label for="Input.Password" class="form-label">Password</label>
-                    <ValidationMessage For="() => Input.Password" class="text-danger" />
-                </div>
-                <div class="checkbox mb-3">
-                    <label class="form-label">
-                        <InputCheckbox @bind-Value="Input.RememberMe" class="darker-border-checkbox form-check-input" />
-                        Remember me
-                    </label>
-                </div>
-                <div>
-                    <button type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
-                </div>
+                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H2" Class="rz-mb-4">Use a local account to log in.</RadzenText>
+                <RadzenAlert Visible="@(!editContext.Validate() && editContext.GetValidationMessages().Any())"
+                             AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter"
+                             AllowClose="false">
+                    <ValidationSummary />
+                </RadzenAlert>
+
+                <RadzenStack Gap="1rem">
+                    <RadzenFormField Text="Email" Variant="Variant.Outlined">
+                        <RadzenTextBox @bind-Value="Input.Email" Name="Input.Email" style="width: 100%;"
+                                       autocomplete="username" aria-required="true" />
+                    </RadzenFormField>
+                    <ValidationMessage For="() => Input.Email" class="rz-text-danger rz-mb-2" />
+
+                    <RadzenFormField Text="Password" Variant="Variant.Outlined">
+                        <RadzenPassword @bind-Value="Input.Password" Name="Input.Password" style="width: 100%;"
+                                        autocomplete="current-password" aria-required="true" />
+                    </RadzenFormField>
+                    <ValidationMessage For="() => Input.Password" class="rz-text-danger rz-mb-2" />
+
+                    <div class="rz-display-flex rz-align-center rz-mb-4">
+                        <RadzenCheckBox @bind-Value="Input.RememberMe" Name="Input.RememberMe" TValue="bool" />
+                        <RadzenLabel Text="Remember me" Component="RememberMe" Class="rz-ms-2" />
+                    </div>
+
+                    <RadzenButton ButtonType="ButtonType.Submit" Text="Log in"
+                                  ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Large" FullWidth="true" />
+
+                </RadzenStack>
             </EditForm>
-        </section>
+        </RadzenCard>
     </div>
 </div>
 
 @code {
-    private string? errorMessage;
     private EditContext editContext = default!;
 
     [CascadingParameter]
@@ -94,7 +100,7 @@
         {
             RedirectManager.RedirectTo(
                 "Account/LoginWith2fa",
-                new() { ["returnUrl"] = ReturnUrl, ["rememberMe"] = Input.RememberMe });
+                new Dictionary<string, object?> { ["returnUrl"] = ReturnUrl, ["rememberMe"] = Input.RememberMe });
         }
         else if (result.IsLockedOut)
         {
@@ -103,7 +109,8 @@
         }
         else
         {
-            errorMessage = "Error: Invalid login attempt.";
+            // StatusMessage.SetStatusMessage("Invalid login attempt.", Radzen.AlertStyle.Danger);
+            RedirectManager.RedirectToCurrentPageWithStatus("Invalid login attempt.", Radzen.AlertStyle.Danger);
         }
     }
 

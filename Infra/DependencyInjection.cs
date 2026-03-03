@@ -71,14 +71,20 @@ public static class DependencyInjection
             .AddSignInManager()
             .AddDefaultTokenProviders();
 
-        builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme)
-            .AddCookie(IdentityConstants.ApplicationScheme, options =>
-            {
-                options.LoginPath = "/Identity/Account/Login";
-                options.AccessDeniedPath = "/Identity/Account/AccessDenied";
-                options.LogoutPath = "/Identity/Account/Logout";
-                // configure other cookie options as needed
-            });
+        builder.Services.AddAuthentication(options =>
+        {
+            options.DefaultScheme = IdentityConstants.ApplicationScheme;
+        })
+        .AddIdentityCookies();
+
+        builder.Services.ConfigureApplicationCookie(options =>
+        {
+            options.LoginPath = "/Account/Login";
+            options.AccessDeniedPath = "/Account/AccessDenied";
+            options.LogoutPath = "/Account/Logout";
+        });
+        
+        builder.Services.AddAuthorization();
 
         builder.Services.AddSingleton(TimeProvider.System);
         builder.Services.AddTransient<IIdentityService, IdentityService>();

@@ -1,0 +1,54 @@
+﻿@using Web.Services
+@inject StatusMessageService Status
+
+@if (!string.IsNullOrEmpty(DisplayMessage))
+{
+    <div id="ssr-status-container" class="rz-m-4">
+        <RadzenAlert AlertStyle="@severityFromCookie" AllowClose="false" AllVariant="Variant.Flat" ShowIcon="true">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span>@DisplayMessage</span>
+
+                @* This button works in Static SSR because it is pure JS *@
+                <button tabindex="0" type="button" 
+                    class="rz-button rz-button-sm rz-variant-text rz-light rz-shade-default rz-button-icon-only"
+                        onclick="document.getElementById('ssr-status-container').remove()">
+                    <span class="rz-button-box"><i class="notranslate rz-button-icon-left rzi">close</i></span>
+                </button>
+            </div>
+        </RadzenAlert>
+    </div>
+}
+
+@code {
+    private string? messageFromCookie;
+    private Radzen.AlertStyle severityFromCookie = Radzen.AlertStyle.Info;
+
+    [Parameter]
+    public string? Message { get; set; }
+
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
+
+    private string? DisplayMessage => Message ?? messageFromCookie;
+
+    protected override void OnInitialized()
+    {
+        messageFromCookie = HttpContext.Request.Cookies[StatusMessageService.StatusCookieMessage];
+
+
+
+        if (HttpContext.Request.Cookies.TryGetValue(StatusMessageService.StatusCookieSeverity, out string? severityString))
+        {
+            if (Enum.TryParse(severityString, ignoreCase: true, out Radzen.AlertStyle severity))
+            {
+                severityFromCookie = severity;
+            }
+        }
+
+        if (messageFromCookie is not null)
+        {
+            HttpContext.Response.Cookies.Delete(StatusMessageService.StatusCookieMessage);
+            HttpContext.Response.Cookies.Delete(StatusMessageService.StatusCookieSeverity);
+        }
+    }
+}

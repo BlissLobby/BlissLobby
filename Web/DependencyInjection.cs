@@ -12,6 +12,9 @@ public static class DependencyInjection
         {
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
         }
+        builder.Services.AddScoped<StatusMessageService>();
+        
+        builder.Services.AddScoped<RedirectManager>();
 
         builder.Services.AddScoped<IUser, CurrentUser>();
 
