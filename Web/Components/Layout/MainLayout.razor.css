@@ -1,27 +1,3 @@
-/* Hide the actual checkbox */
-.sidebar-toggle-input {
-    display: none;
-}
-
-
-/* Target Radzen's generated sidebar class */
-::deep .my-custom-sidebar {
-    display: none !important;
-    width: 250px;
-}
-
-/* Make our label look like a Radzen button on hover */
-::deep .custom-toggle-btn:hover {
-    background-color: var(--rz-secondary-lighter);
-    border-radius: var(--rz-border-radius-1);
-}
-
-/* Ensure the sidebar behaves correctly with the checkbox state */
-.sidebar-toggle-input:checked ~ ::deep .rz-layout .my-custom-sidebar {
-    display: block !important;
-}
-
-
 #blazor-error-ui {
     color-scheme: light only;
     background: lightyellow;
@@ -36,9 +12,9 @@
     z-index: 1000;
 }
 
-    #blazor-error-ui .dismiss {
-        cursor: pointer;
-        position: absolute;
-        right: 0.75rem;
-        top: 0.5rem;
-    }
+#blazor-error-ui .dismiss {
+    cursor: pointer;
+    position: absolute;
+    right: 0.75rem;
+    top: 0.5rem;
+}

@@ -1,29 +1,42 @@
 ﻿@inherits LayoutComponentBase
+<style>
+    /* Hide the checkbox state tracker */
+    #sidebar-toggle {
+        display: none;
+    }
 
-<div class="layout-wrapper">
-    <!-- 1. The hidden checkbox that maintains toggle state -->
-    <input type="checkbox" id="sidebar-toggle" class="sidebar-toggle-input" />
-    <RadzenLayout>
-        <RadzenHeader>
-            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0">
-                @* This label "clicks" the checkbox for us *@
-                <label for="sidebar-toggle" class="rz-p-2 rz-display-flex rz-cursor-pointer custom-toggle-btn">
-                    <RadzenIcon Icon="menu" />
-                </label>
+    /* Target Radzen's generated sidebar class */
+    .custom-sidebar {
+        display: none !important;
+        width: 250px;
+    }
 
-                <RadzenLabel Text="BlissLobby" />
-            </RadzenStack>
-        </RadzenHeader>
-        <RadzenSidebar Class="my-custom-sidebar">
-            <RadzenPanelMenu>
-                <RadzenPanelMenuItem Text="Home" Path="/" Icon="home" />
-                <RadzenPanelMenuItem Text="Data" Path="/weather" Icon="account_box" />
-            </RadzenPanelMenu>
-        </RadzenSidebar>
-        <RadzenBody>
-            <div class="rz-p-4">
-                @Body
-            </div>
-        </RadzenBody>
-    </RadzenLayout>
-</div>
+    /* Make our label look like a Radzen button on hover */
+    .custom-toggle-btn:hover {
+        background-color: var(--rz-secondary-lighter);
+        border-radius: var(--rz-border-radius-1);
+    }
+
+    /* Ensure the sidebar behaves correctly with the checkbox state */
+    #sidebar-toggle:checked ~ .rz-layout .custom-sidebar {
+        display: block !important;
+    }
+
+</style>
+
+<RadzenComponents />
+
+<!-- The invisible state tracker -->
+<input type="checkbox" id="sidebar-toggle" class="sidebar-toggle-input" />
+
+<RadzenLayout>
+    <LayoutHeader />
+
+    <LayoutSidebar />
+
+    <RadzenBody>
+        <div class="rz-p-4">
+            @Body
+        </div>
+    </RadzenBody>
+</RadzenLayout>
