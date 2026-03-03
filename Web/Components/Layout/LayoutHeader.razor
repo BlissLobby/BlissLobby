@@ -1,9 +1,19 @@
-﻿<RadzenHeader>
-    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" class="rz-p-2">
-        <!-- This label triggers the checkbox in MainLayout -->
-        <label for="sidebar-toggle" style="cursor: pointer; display: flex; align-items: center;" class="custom-toggle-btn">
-            <RadzenIcon Icon="menu" />
-        </label>
-        <RadzenLabel Text="BlissLobby" />
+﻿@using Microsoft.AspNetCore.Components.Authorization
+<RadzenHeader>
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center" Style="width: 100%;">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" class="rz-p-2">
+            <!-- This label triggers the checkbox in MainLayout -->
+            <label for="sidebar-toggle" style="cursor: pointer; display: flex; align-items: center;" class="custom-toggle-btn">
+                <RadzenIcon Icon="menu" />
+            </label>
+            <RadzenLabel Text="BlissLobby" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" class="rz-p-2">
+            <AuthorizeView>
+                <NotAuthorized>
+                    <RadzenLink Path="account/login" Text="Login" Variant="Variant.Text" />
+                </NotAuthorized>
+            </AuthorizeView>
+        </RadzenStack>
     </RadzenStack>
 </RadzenHeader>

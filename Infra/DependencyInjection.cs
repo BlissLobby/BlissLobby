@@ -84,8 +84,6 @@ public static class DependencyInjection
             options.LogoutPath = "/Account/Logout";
         });
         
-        builder.Services.AddAuthorization();
-
         builder.Services.AddSingleton(TimeProvider.System);
         builder.Services.AddTransient<IIdentityService, IdentityService>();
 

@@ -20,6 +20,8 @@ public static class DependencyInjection
 
         builder.Services.AddHttpContextAccessor();
 
+        builder.Services.AddCascadingAuthenticationState();
+
         builder.Services.AddExceptionHandler<CustomExceptionHandler>();
 
         // Add services to the container.
