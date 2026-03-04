@@ -233,8 +233,8 @@ Visitor Management System for office spaces. Can also be used for residential sp
 * Note: The Notification entity is designed to store notifications related to visits, such as visit check-ins, check-outs, invite approvals, and rejections. The RecipientId field allows for efficient querying of notifications for a specific user, while the VisitId field allows for tracking notifications related to a specific visit. The IsRead field can be used to filter unread notifications for users, and the CreatedAt field can be used for sorting and retention purposes. A retention plan can be implemented to automatically delete notifications after a certain period (e.g., 365 days) to manage storage and comply with data retention policies.
 
 # TODOs
+* Use separate claims for username and email
 * Ensure Roles are created during db initialization, also fix the db initialization strategy to avoid data loss during development
-* Define the logical data model for entities
 * Define UI screens
 * Define project scope exclusions to avoid scope creep
 * Define application processes as user stories

@@ -6,10 +6,24 @@
             <label for="sidebar-toggle" style="cursor: pointer; display: flex; align-items: center;" class="custom-toggle-btn">
                 <RadzenIcon Icon="menu" />
             </label>
-            <RadzenLabel Text="BlissLobby" />
+            <NavLink href="">
+                <RadzenLabel Text="BlissLobby" Style="cursor: pointer;" />
+            </NavLink>
         </RadzenStack>
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" class="rz-p-2">
             <AuthorizeView>
+                <Authorized>
+                    <RadzenProfileMenu>
+                        <Template>
+                            <RadzenGravatar Email="@context.User.Identity?.Name">
+                            </RadzenGravatar>
+                        </Template>
+                        <ChildContent>
+                            <RadzenProfileMenuItem Text="Profile" Path="account/profile" Icon="account_circle"></RadzenProfileMenuItem>
+                            <RadzenProfileMenuItem Text="Logout" Path="account/logout" Icon="exit_to_app"></RadzenProfileMenuItem>
+                        </ChildContent>
+                    </RadzenProfileMenu>
+                </Authorized>
                 <NotAuthorized>
                     <RadzenLink Path="account/login" Text="Login" Variant="Variant.Text" />
                 </NotAuthorized>

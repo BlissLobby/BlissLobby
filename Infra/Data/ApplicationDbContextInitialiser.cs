@@ -20,7 +20,7 @@ public static class InitialiserExtensions
     }
 }
 
-public class ApplicationDbContextInitialiser(ILogger<ApplicationDbContextInitialiser> logger, ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+public class ApplicationDbContextInitialiser(ILogger<ApplicationDbContextInitialiser> logger, ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IUserStore<ApplicationUser> store)
 {
     public async Task InitialiseAsync()
     {
@@ -69,6 +69,11 @@ public class ApplicationDbContextInitialiser(ILogger<ApplicationDbContextInitial
         if (userManager.Users.All(u => u.UserName != administrator.UserName))
         {
             await userManager.CreateAsync(administrator, "Administrator1!");
+            if (store is IUserEmailStore<ApplicationUser> emailStore)
+            {
+                // confirm user's email programmatically
+                await emailStore.SetEmailConfirmedAsync(administrator, true, CancellationToken.None);
+            }
             if (!string.IsNullOrWhiteSpace(Roles.Administrator))
             {
                 await userManager.AddToRolesAsync(administrator, [Roles.Administrator]);
