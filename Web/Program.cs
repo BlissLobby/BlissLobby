@@ -1,5 +1,6 @@
 using Infra.Data;
 using Web.Components;
+using Web.Components.Layout;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,5 +29,10 @@ app.UseAntiforgery();
 app.MapStaticAssets();
 app.MapRazorComponents<Application>();
     //.AddInteractiveWebAssemblyRenderMode();
+
+app.MapAdditionalIdentityEndpoints();
+
+// map api endpoints defined in the project.
+//app.MapEndpoints();
 
 app.Run();

@@ -20,8 +20,12 @@
         <RadzenColumn Size="12" SizeMD="8">
             <RadzenStack Gap="0.5rem">
                 <div>
-                    <RadzenText TextStyle="TextStyle.Overline" Class="rz-display-flex rz-mt-2 rz-mb-0">Name</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Overline" Class="rz-display-flex rz-mt-2 rz-mb-0">Username</RadzenText>
                     <RadzenText TextStyle="TextStyle.Body1"><b>@HttpContextAccessor.HttpContext?.User.Identity?.Name</b></RadzenText>
+                </div>
+                <div>
+                    <RadzenText TextStyle="TextStyle.Overline" Class="rz-display-flex rz-mt-2 rz-mb-0">Name</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body1"><b>@HttpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.GivenName)?.Value</b></RadzenText>
                 </div>
                 <div>
                     <RadzenText TextStyle="TextStyle.Overline" Class="rz-display-flex rz-mt-2 rz-mb-0">Email</RadzenText>

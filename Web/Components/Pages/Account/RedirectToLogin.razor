@@ -1,0 +1,9 @@
+﻿@inject NavigationManager NavigationManager
+<h3>RedirectToLogin</h3>
+
+@code {
+    protected override void OnInitialized()
+    {
+        NavigationManager.NavigateTo($"Account/Login?returnUrl={Uri.EscapeDataString(NavigationManager.Uri)}", forceLoad: true);
+    }
+}
