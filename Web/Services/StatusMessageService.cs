@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
-using Microsoft.EntityFrameworkCore;
-
-namespace Web.Services;
+﻿namespace Web.Services;
 
 public class StatusMessageService(IHttpContextAccessor contextAccessor)
 {
