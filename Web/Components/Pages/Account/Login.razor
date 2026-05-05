@@ -41,8 +41,14 @@
                     <ValidationMessage For="() => Input.Password" class="rz-text-danger rz-mb-2" />
 
                     <div class="rz-display-flex rz-align-center rz-mb-4">
-                        <RadzenCheckBox @bind-Value="Input.RememberMe" Name="Input.RememberMe" TValue="bool" />
-                        <RadzenLabel Text="Remember me" Component="RememberMe" Class="rz-ms-2" />
+                        <div class="rz-chkbox">
+                            @* Native checkbox for SSR interaction *@
+                            <InputCheckbox type="checkbox"
+                                   name="Input.RememberMe"
+                                   @bind-Value="@Input.RememberMe"
+                                   class="rz-chkbox-box" />
+                        </div>
+                        <label class="rz-label" for="Input.RememberMe">Remember me</label>
                     </div>
 
                     <RadzenButton ButtonType="ButtonType.Submit" Text="Log in"

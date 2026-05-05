@@ -1,5 +1,64 @@
-﻿<h3>Index</h3>
+﻿@page "/users"
+@attribute [StreamRendering]
+
+@using App.Common.Pagination
+@using App.Users.Queries.GetUsersForDisplay
+@using Domain.Entities
+@using Nagasudhir.SmartStaticGrid.Components
+@using Nagasudhir.SmartStaticGrid.Models
+
+@inject IMediator mediator
+
+<PageTitle>Users</PageTitle>
+
+<h1>Users</h1>
+
+<SmartStaticGrid Id="RadzenStyledUsers"
+                 TItem="UserDto"
+                 Columns="userCols"
+                 DataProvider="LoadUsers"
+                 TableClass="rz-grid-table rz-datatable"
+                 HeaderClass="rz-column-title"
+                 RowClass="rz-datatable-even"
+                 PagerContainerClass="rz-paginator"
+                 PageSizeOptions=@(new int[] {10,20,50})>
+
+    <RowTemplate Context="user">
+        <td class="rz-grid-col-text">@user.UserName</td>
+        <td class="rz-grid-col-text">@user.DisplayName</td>
+        <td class="rz-grid-col-text">@user.Email</td>
+        <td class="rz-grid-col-text">@string.Join(", ", user.Roles)</td>
+    </RowTemplate>
+
+    <EmptyTemplate>
+        <div class="rz-p-12 rz-text-align-center">
+            <RadzenIcon Icon="find_in_page" Style="font-size: 3rem;" />
+            <p>No users found.</p>
+        </div>
+    </EmptyTemplate>
+
+</SmartStaticGrid>
 
 @code {
+    public static readonly List<ColumnDef> userCols = [
+        new(nameof(ApplicationUser.UserName), "User Name", Searchable: true),
+        new(nameof(ApplicationUser.DisplayName), "Name", Searchable: true),
+        new(nameof(ApplicationUser.Email), "Email", Searchable: true),
+        new(nameof(UserDto.Roles), "Roles", Searchable: false),
+    ];
 
+    private async Task<GridResponse<UserDto>> LoadUsers(GridRequest req)
+    {
+        // Simulate asynchronous loading to check ui responsiveness
+        // await Task.Delay(3000);
+        
+        var (users, totalCount) = await mediator.Send(
+            new GetUsersForDisplayQuery(
+                new PaginationQuery(req.Page, req.PageSize, req.Filters,
+                                    req.SortBy, req.SortDesc, req.RequestNewCount
+                )
+            )
+        );
+        return new GridResponse<UserDto>(users, totalCount);
+    }
 }
