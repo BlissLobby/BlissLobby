@@ -3,8 +3,11 @@ using Domain.Constants;
 using Domain.Entities;
 using Infra.Data;
 using Infra.Data.Interceptors;
+using Infra.Email;
 using Infra.Identity;
+using Infra.Sms;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
@@ -84,9 +87,15 @@ public static class DependencyInjection
             options.AccessDeniedPath = "/Account/AccessDenied";
             options.LogoutPath = "/Account/Logout";
         });
-        
+
         builder.Services.AddSingleton(TimeProvider.System);
         builder.Services.AddTransient<IIdentityService, IdentityService>();
+
+        // TODO: Replace with real email sender service, or provide choice of using SMTP or Webhook or dummy email sender based on configuration
+        builder.Services.AddSingleton<IEmailSender, DummyEmailSender>();
+
+        // TODO: Replace with real SMS sender service, or provide choice of using Webhook or dummy SMS sender based on configuration
+        builder.Services.AddSingleton<ISmsSender, DummySmsSender>();
 
         builder.Services.AddAuthorizationBuilder()
             .AddPolicy(Policies.CanPurge, policy => policy.RequireRole(Roles.Administrator));

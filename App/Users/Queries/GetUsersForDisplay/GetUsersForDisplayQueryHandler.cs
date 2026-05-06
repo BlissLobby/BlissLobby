@@ -1,13 +1,9 @@
 ﻿using App.Common.Pagination;
-using App.Common.Security;
 using Domain.Constants;
 using Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 
 namespace App.Users.Queries.GetUsersForDisplay;
-
-[Authorize]
-public record GetUsersForDisplayQuery(PaginationQuery Query) : IRequest<PaginationResponse<UserDto>>;
 
 public class GetUsersForDisplayQueryHandler(UserManager<ApplicationUser> userManager) : IRequestHandler<GetUsersForDisplayQuery, PaginationResponse<UserDto>>
 {
