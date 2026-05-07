@@ -1,4 +1,5 @@
 ﻿using App.Common.Interfaces;
+using App.Users.Interfaces;
 using Domain.Constants;
 using Domain.Entities;
 using Infra.Data;
@@ -90,6 +91,7 @@ public static class DependencyInjection
 
         builder.Services.AddSingleton(TimeProvider.System);
         builder.Services.AddTransient<IIdentityService, IdentityService>();
+        builder.Services.AddTransient<IUserRegistrationService, UserRegistrationService>();
 
         // TODO: Replace with real email sender service, or provide choice of using SMTP or Webhook or dummy email sender based on configuration
         builder.Services.AddSingleton<IEmailSender, DummyEmailSender>();

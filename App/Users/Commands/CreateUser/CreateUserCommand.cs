@@ -1,9 +1,11 @@
-﻿using App.Users.Queries.GetUsersForDisplay;
+﻿using App.Common.Security;
+using App.Users.Queries.GetUsersForDisplay;
 using Domain.Constants;
 using Microsoft.AspNetCore.Identity;
 
 namespace App.Users.Commands.CreateUser;
 
+[Authorize(Roles = Roles.Administrator)]
 public class CreateUserCommand : IRequest<IdentityResult>
 {
     public required string Username { get; set; }
