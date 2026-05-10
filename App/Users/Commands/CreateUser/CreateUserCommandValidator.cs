@@ -1,7 +1,5 @@
 ﻿using App.Common.Interfaces;
 using App.Utils;
-using Domain.Constants;
-using System.Text.RegularExpressions;
 
 namespace App.Users.Commands.CreateUser;
 

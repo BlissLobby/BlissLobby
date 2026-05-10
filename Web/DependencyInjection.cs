@@ -1,4 +1,6 @@
 ﻿using App.Common.Interfaces;
+using App.Users.Commands.CreateUser;
+using FluentValidation;
 using Radzen;
 using Web.Services;
 
@@ -29,5 +31,6 @@ public static class DependencyInjection
                //.AddInteractiveWebAssemblyComponents();
         builder.Services.AddRadzenComponents();
 
+        builder.Services.AddValidatorsFromAssemblyContaining<IUser>();
     }
 }

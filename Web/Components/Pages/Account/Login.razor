@@ -15,8 +15,8 @@
 <PageTitle>Log in</PageTitle>
 
 <RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1">Log in</RadzenText>
-<div class="row">
-    <div class="col-lg-6">
+<RadzenRow Gap="1rem">
+    <RadzenColumn SizeMD="6">
         <RadzenCard Variant="Variant.Flat" Class="rz-p-4 rz-p-lg-12">
             <EditForm Enhance EditContext="editContext" method="post" OnSubmit="LoginUser" FormName="login">
                 <DataAnnotationsValidator />
@@ -57,8 +57,8 @@
                 </RadzenStack>
             </EditForm>
         </RadzenCard>
-    </div>
-</div>
+    </RadzenColumn>
+</RadzenRow>
 
 @code {
     private EditContext editContext = default!;

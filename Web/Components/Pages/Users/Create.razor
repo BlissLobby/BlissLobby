@@ -2,7 +2,9 @@
 @attribute [StreamRendering]
 
 @using App.Buildings.Queries.GetBuildings
+@using App.Common.Interfaces
 @using App.Users.Commands.CreateUser
+@using Blazilla
 @using Domain.Entities
 @using System.ComponentModel.DataAnnotations
 
@@ -12,12 +14,11 @@
 <PageTitle>Create user</PageTitle>
 
 <RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1">Create User</RadzenText>
-<div class="row">
-    <div class="col-lg-6">
+<RadzenRow Gap="1rem">
+    <RadzenColumn SizeSM="4">
         <RadzenCard Variant="Variant.Flat" Class="rz-p-4 rz-p-lg-12">
-            <EditForm Enhance EditContext="editContext" method="post" OnSubmit="HandleValidSubmit" FormName="createUser">
-                <DataAnnotationsValidator />
-                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H2" Class="rz-mb-4">Create a new User.</RadzenText>
+            <EditForm Enhance EditContext="editContext" method="post" OnSubmit="HandleSubmit" FormName="createUser">
+                <FluentValidator AsyncMode="true" />
                 <RadzenAlert Visible="@(!editContext.Validate() && editContext.GetValidationMessages().Any())"
                              AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter"
                              AllowClose="false">
@@ -141,8 +142,10 @@
                 </RadzenStack>
             </EditForm>
         </RadzenCard>
-    </div>
-</div>
+    </RadzenColumn>
+</RadzenRow>
+
+<p><a href="/users">Back to List</a></p>
 
 
 
@@ -160,15 +163,20 @@
 
     private List<Building> Buildings { get; set; } = new();
 
-    private async Task HandleValidSubmit()
+    private async Task HandleSubmit()
     {
-        await mediator.Send(Input);
+        var isValid = await editContext.ValidateAsync();
+        if (isValid)
+        {
+            await mediator.Send(Input);
+        }
     }
 
     protected override async Task OnInitializedAsync()
     {
         // TODO: access whether this line is required
-        // editContext = new EditContext(Input);
+        Input ??= new();
+        editContext = new EditContext(Input);
 
         Buildings = await mediator.Send(new GetBuildingsQuery());
     }
