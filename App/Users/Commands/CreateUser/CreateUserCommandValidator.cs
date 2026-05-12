@@ -43,10 +43,9 @@ public class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
     // custom rule to validate BuildingId
     private async Task<bool> BeAValidBuildingId(string? buildingId, CancellationToken cancellationToken)
     {
-        if (buildingId == null) return true;
+        if (string.IsNullOrWhiteSpace(buildingId)) return true;
 
-        return !string.IsNullOrWhiteSpace(buildingId) && 
-                    await _dbContext.Buildings.AsNoTracking()
+        return await _dbContext.Buildings.AsNoTracking()
                             .AnyAsync(b => b.Id == buildingId, cancellationToken);
     }
 }

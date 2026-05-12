@@ -23,7 +23,7 @@ public static class FluentValidationUtils
         if (phoneNumber == null) return true;
 
         // Regex to check valid phone number.
-        string pattern = @"^[+]{1}(?:[0-9\-\(\)\/\.]\s?){6, 15}[0-9]{1}$";
+        string pattern = @"^[+]{1}(?:[0-9\-\(\)\/\.]\s?){6,15}[0-9]{1}$";
         return Regex.IsMatch(phoneNumber, pattern);
     }
 

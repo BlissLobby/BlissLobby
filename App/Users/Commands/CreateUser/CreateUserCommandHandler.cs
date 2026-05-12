@@ -15,7 +15,7 @@ public class CreateUserCommandHandler(IUserRegistrationService registrationServi
             Email = request.Email,
             PhoneNumber = request.PhoneNumber,
             TwoFactorEnabled = request.IsTwoFactorEnabled,
-            BuildingId = request.BuildingId
+            BuildingId = request.BuildingId.IsWhiteSpace() ? null : request.BuildingId
         };
 
         return await registrationService.RegisterAsync(user, request.Password, request.UserRole,

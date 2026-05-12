@@ -4,15 +4,15 @@ namespace Domain.Entities;
 
 public class Building : BaseAuditableEntity
 {
-    public required string ClusterId { get; set; }
+    public string ClusterId { get; set; } = default!;
     public Cluster Cluster { get; set; } = null!;
 
-    public required string Name { get; set; }
-    public required string Address { get; set; }
-    public required string City { get; set; }
-    public required string State { get; set; }
-    public required string ZipCode { get; set; }
-    public required string Country { get; set; }
+    public string Name { get; set; } = default!;
+    public string Address { get; set; } = default!;
+    public string City { get; set; } = default!;
+    public string State { get; set; } = default!;
+    public string ZipCode { get; set; } = default!;
+    public string Country { get; set; } = default!;
     public string? Description { get; set; }
 
 }
