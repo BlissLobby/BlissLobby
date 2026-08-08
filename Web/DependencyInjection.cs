@@ -1,6 +1,4 @@
 ﻿using App.Common.Interfaces;
-using App.Users.Commands.CreateUser;
-using FluentValidation;
 using Radzen;
 using Web.Services;
 
@@ -31,6 +29,7 @@ public static class DependencyInjection
                //.AddInteractiveWebAssemblyComponents();
         builder.Services.AddRadzenComponents();
 
-        builder.Services.AddValidatorsFromAssemblyContaining<IUser>();
+        // already done in Infra project, so no need to add it here
+        //builder.Services.AddValidatorsFromAssemblyContaining<IUser>();
     }
 }

@@ -27,6 +27,7 @@
         <td class="rz-grid-col-text">@user.UserName</td>
         <td class="rz-grid-col-text">@user.DisplayName</td>
         <td class="rz-grid-col-text">@user.Email</td>
+        <td class="rz-grid-col-text">@user.EmailConfirmed</td>
         <td class="rz-grid-col-text">@string.Join(", ", user.Roles)</td>
     </RowTemplate>
 
@@ -46,6 +47,7 @@
         new(nameof(ApplicationUser.UserName), "User Name", Searchable: true),
         new(nameof(ApplicationUser.DisplayName), "Name", Searchable: true),
         new(nameof(ApplicationUser.Email), "Email", Searchable: true),
+        new(nameof(UserDto.EmailConfirmed), "Email Confirmed", Searchable: false),
         new(nameof(UserDto.Roles), "Roles", Searchable: false),
     ];
 

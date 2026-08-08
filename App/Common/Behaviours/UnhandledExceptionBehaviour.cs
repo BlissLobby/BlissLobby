@@ -15,7 +15,7 @@ public class UnhandledExceptionBehaviour<TRequest, TResponse>(ILogger<TRequest> 
         {
             var requestName = typeof(TRequest).Name;
 
-            logger.LogError(ex, "BlissLobby Request: Unhandled Exception for Request {Name} {@Request}", requestName, request);
+            logger.LogError(ex, "BlissLobby Request: Unhandled Exception of type {ExceptionType} for Request {Name} {@Request}", ex.GetType().Name, requestName, request);
 
             throw;
         }

@@ -27,7 +27,7 @@ public class ApplicationDbContextInitialiser(ILogger<ApplicationDbContextInitial
         try
         {
             // See https://jasontaylor.dev/ef-core-database-initialisation-strategies
-            await context.Database.EnsureDeletedAsync();
+            //await context.Database.EnsureDeletedAsync();
             await context.Database.EnsureCreatedAsync();
         }
         catch (Exception ex)

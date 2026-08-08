@@ -31,6 +31,7 @@ public class GetUsersForDisplayQueryHandler(UserManager<ApplicationUser> userMan
                 UserName = user.UserName ?? "",
                 DisplayName = user.DisplayName,
                 Email = user.Email ?? "",
+                EmailConfirmed = user.EmailConfirmed,
                 Roles = [.. await userManager.GetRolesAsync(user)]
             };
 

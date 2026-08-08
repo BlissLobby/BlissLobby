@@ -1,6 +1,4 @@
-using Domain.Entities;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Identity;
 
 namespace Web.Services
 {
@@ -39,7 +37,7 @@ namespace Web.Services
         public void RedirectToCurrentPageWithStatus(string message, Radzen.AlertStyle severity = Radzen.AlertStyle.Info)
             => RedirectToWithStatus(CurrentPath, message, severity);
 
-        public void RedirectToInvalidUser(UserManager<ApplicationUser> userManager, HttpContext context)
-            => RedirectToWithStatus("Account/InvalidUser", $"Unable to load user with ID '{userManager.GetUserId(context.User)}'.", Radzen.AlertStyle.Danger);
+        //public void RedirectToInvalidUser(UserManager<ApplicationUser> userManager, HttpContext context)
+        //    => RedirectToWithStatus("Account/InvalidUser", $"Unable to load user with ID '{userManager.GetUserId(context.User)}'.", Radzen.AlertStyle.Danger);
     }
 }
