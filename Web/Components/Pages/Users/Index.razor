@@ -14,7 +14,7 @@
 <h1>Users</h1>
 
 <SmartStaticGrid Id="RadzenStyledUsers"
-                 TItem="UserDto"
+                 TItem="UserListDto"
                  Columns="userCols"
                  DataProvider="LoadUsers"
                  TableClass="rz-grid-table rz-datatable"
@@ -29,6 +29,7 @@
         <td class="rz-grid-col-text">@user.Email</td>
         <td class="rz-grid-col-text">@user.EmailConfirmed</td>
         <td class="rz-grid-col-text">@string.Join(", ", user.Roles)</td>
+        <td class="rz-grid-col-text"><a href="/Users/Details/@user.Id">View</a></td>
     </RowTemplate>
 
     <EmptyTemplate>
@@ -47,11 +48,12 @@
         new(nameof(ApplicationUser.UserName), "User Name", Searchable: true),
         new(nameof(ApplicationUser.DisplayName), "Name", Searchable: true),
         new(nameof(ApplicationUser.Email), "Email", Searchable: true),
-        new(nameof(UserDto.EmailConfirmed), "Email Confirmed", Searchable: false),
-        new(nameof(UserDto.Roles), "Roles", Searchable: false),
+        new(nameof(UserListDto.EmailConfirmed), "Email Confirmed", Searchable: false),
+        new(nameof(UserListDto.Roles), "Roles", Searchable: false),
+        new("Actions", "Actions", Searchable: false),
     ];
 
-    private async Task<GridResponse<UserDto>> LoadUsers(GridRequest req)
+    private async Task<GridResponse<UserListDto>> LoadUsers(GridRequest req)
     {
         // Simulate asynchronous loading to check ui responsiveness
         // await Task.Delay(3000);
@@ -63,6 +65,6 @@
                 )
             )
         );
-        return new GridResponse<UserDto>(users, totalCount);
+        return new GridResponse<UserListDto>(users, totalCount);
     }
 }

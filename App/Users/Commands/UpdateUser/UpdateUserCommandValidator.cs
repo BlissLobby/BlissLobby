@@ -2,15 +2,18 @@
 using App.Utils;
 using App.Utils.FluentValidation;
 
-namespace App.Users.Commands.CreateUser;
+namespace App.Users.Commands.UpdateUser;
 
-public class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
+public class UpdateUserCommandValidator : AbstractValidator<UpdateUserCommand>
 {
     private readonly IApplicationDbContext _dbContext;
 
-    public CreateUserCommandValidator(IApplicationDbContext dbContext)
+    public UpdateUserCommandValidator(IApplicationDbContext dbContext)
     {
         _dbContext = dbContext;
+
+        RuleFor(v => v.Id)
+            .NotEmpty().WithMessage("User ID is required");
 
         RuleFor(v => v.Username)
             .NotEmpty().WithMessage("Username is required")
@@ -34,12 +37,10 @@ public class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
             .MustAsync(BeAValidBuildingId).WithMessage("Building Id is not present in the database");
 
         RuleFor(v => v.Password)
-                .NotEmpty().WithMessage("Password is required")
                 .Equal(v => v.ConfirmPassword).WithMessage("Passwords do not match");
 
     }
 
-    // custom rule to validate BuildingId
     private async Task<bool> BeAValidBuildingId(string? buildingId, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(buildingId)) return true;

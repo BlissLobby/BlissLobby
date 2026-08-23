@@ -1,0 +1,76 @@
+﻿@page "/Users/Details/{Id}"
+
+@using App.Users.Queries.GetUserForDisplay
+@using Web.Services
+
+@inject IMediator mediator
+@inject RedirectManager RedirectManager
+
+
+<PageTitle>User Details</PageTitle>
+
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="rz-mb-4">
+    User Details
+</RadzenText>
+
+@if (User == null)
+{
+    <p>Please wait...</p>
+}
+else
+{
+    <RadzenCard Class="rz-my-6 rz-mx-auto" Style="max-width: 600px;">
+        <RadzenRow AlignItems="AlignItems.Center">
+            <RadzenColumn Size="12" SizeMD="4" Class="rz-text-align-center">
+                <!-- Read-only Avatar/Image -->
+                <RadzenImage Path="user-avatar.png" Style="width: 100px; height: 100px; border-radius: 50%;" />
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeMD="8">
+                <RadzenStack Gap="0.5rem">
+                    <div>
+                        <RadzenText TextStyle="TextStyle.Overline" Class="rz-display-flex rz-mt-2 rz-mb-0">Username</RadzenText>
+                        <RadzenText TextStyle="TextStyle.Body1"><b>@User.UserName</b></RadzenText>
+                    </div>
+                    <div>
+                        <RadzenText TextStyle="TextStyle.Overline" Class="rz-display-flex rz-mt-2 rz-mb-0">Name</RadzenText>
+                        <RadzenText TextStyle="TextStyle.Body1"><b>@User.DisplayName</b></RadzenText>
+                    </div>
+                    <div>
+                        <RadzenText TextStyle="TextStyle.Overline" Class="rz-display-flex rz-mt-2 rz-mb-0">Email</RadzenText>
+                        <RadzenText TextStyle="TextStyle.Body1"><b>@($"{User.Email}{(User.EmailConfirmed ? "" : " (Not Confirmed)")}")</b></RadzenText>
+                    </div>
+                    <div>
+                        <RadzenText TextStyle="TextStyle.Overline" Class="rz-display-flex rz-mt-2 rz-mb-0">Phone</RadzenText>
+                        <RadzenText TextStyle="TextStyle.Body1"><b>@($"{User.Phone}{(User.PhoneConfirmed ? "" : " (Not Confirmed)")}")</b></RadzenText>
+                    </div>
+                    <div>
+                        <RadzenText TextStyle="TextStyle.Overline" Class="rz-display-flex rz-mt-2 rz-mb-0">Roles</RadzenText>
+                        <RadzenText TextStyle="TextStyle.Body1"><b>@string.Join(", ", @User.Roles)</b></RadzenText>
+                    </div>
+                </RadzenStack>
+            </RadzenColumn>
+        </RadzenRow>
+    </RadzenCard>
+}
+
+<p><a href="/Users">Back to User List</a></p>
+
+@code {
+    [Parameter]
+    public required string Id { get; set; }
+
+    public UserDto User { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        var user = await mediator.Send(new GetUserForDisplayQuery(Id));
+
+        if (user == null)
+        {
+            RedirectManager.RedirectTo("/not-found", true);
+            return;
+        }
+        User = user;
+    }
+}

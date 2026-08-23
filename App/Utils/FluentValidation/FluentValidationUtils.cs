@@ -1,7 +1,7 @@
 ﻿using Domain.Constants;
 using System.Text.RegularExpressions;
 
-namespace App.Utils;
+namespace App.Utils.FluentValidation;
 
 public static class FluentValidationUtils
 {

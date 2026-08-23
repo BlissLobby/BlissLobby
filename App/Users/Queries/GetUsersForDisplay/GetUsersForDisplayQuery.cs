@@ -4,4 +4,4 @@ using App.Common.Security;
 namespace App.Users.Queries.GetUsersForDisplay;
 
 [Authorize]
-public record GetUsersForDisplayQuery(PaginationQuery Query) : IRequest<PaginationResponse<UserDto>>;
+public record GetUsersForDisplayQuery(PaginationQuery Query) : IRequest<PaginationResponse<UserListDto>>;

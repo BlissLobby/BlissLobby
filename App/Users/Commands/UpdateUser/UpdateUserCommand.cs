@@ -1,12 +1,12 @@
-﻿using App.Common.Security;
-using Domain.Constants;
+﻿using Domain.Constants;
+using Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 
-namespace App.Users.Commands.CreateUser;
+namespace App.Users.Commands.UpdateUser;
 
-[Authorize(Roles = Roles.Administrator)]
-public class CreateUserCommand : IRequest<IdentityResult>
+public class UpdateUserCommand : IRequest<List<IdentityResult>>
 {
+    public string Id { get; set; } = default!;
     public string Username { get; set; } = default!;
     public string DisplayName { get; set; } = default!;
     public string Email { get; set; } = default!;

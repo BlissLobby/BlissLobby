@@ -36,6 +36,10 @@ Visitor Management System for office spaces. Can also be used for residential sp
   * Option for application admin (data security officer) to remove visitor's personal information and visit information
   * Option to take vistor consent (via physical signature or email) to store PII data and visit data
   * GDPR compliance
+* User management auditability
+  * Log all user management actions (create, update, delete)
+  * Move deleted users to an archive table and scrub sensitive information if not required
+  * Each user edit log should contain fields that were changed, old value, new value, who changed it and when
 * Observability (dashboards and alarms) for application health and performance
 * Support horizontal scalability (provide options for distributed cache)
 * Support multi-tenancy after the application is matured for single tenant setup
@@ -61,6 +65,7 @@ Visitor Management System for office spaces. Can also be used for residential sp
 
 ## User management
 * Users Create, View, Update (password, email, username, phone, disable), Delete pages - actors: SuperAdmin, ClusterAdmin
+* Cluster Admin should be able to view and manage users only in his cluster. SuperAdmin should be able to view and manage all users.
 
 ## Buildings management
 * Buildings CRUD - actors: SuperAdmin

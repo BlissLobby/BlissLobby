@@ -1,4 +1,4 @@
-﻿namespace App.Users.Queries.GetUsersForDisplay;
+﻿namespace App.Users.Queries.GetUserForDisplay;
 
 public class UserDto
 {
@@ -10,6 +10,9 @@ public class UserDto
 
     public required string Email { get; set; }
     public required bool EmailConfirmed { get; set; }
+
+    public required string Phone { get; set; }
+    public required bool PhoneConfirmed { get; set; }
 
     public List<string> Roles { get; set; } = [];
 }

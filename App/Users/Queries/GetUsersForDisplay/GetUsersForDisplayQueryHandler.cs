@@ -5,9 +5,9 @@ using Microsoft.AspNetCore.Identity;
 
 namespace App.Users.Queries.GetUsersForDisplay;
 
-public class GetUsersForDisplayQueryHandler(UserManager<ApplicationUser> userManager) : IRequestHandler<GetUsersForDisplayQuery, PaginationResponse<UserDto>>
+public class GetUsersForDisplayQueryHandler(UserManager<ApplicationUser> userManager) : IRequestHandler<GetUsersForDisplayQuery, PaginationResponse<UserListDto>>
 {
-    public async Task<PaginationResponse<UserDto>> Handle(GetUsersForDisplayQuery usersQuery, CancellationToken cancellationToken)
+    public async Task<PaginationResponse<UserListDto>> Handle(GetUsersForDisplayQuery usersQuery, CancellationToken cancellationToken)
     {
         var req = usersQuery.Query;
         IQueryable<ApplicationUser> users = userManager.Users;
@@ -21,11 +21,11 @@ public class GetUsersForDisplayQueryHandler(UserManager<ApplicationUser> userMan
         // get paginated results
         users = users.ApplyPagination(req.Page, req.PageSize);
 
-        List<UserDto> userDtos = [];
+        List<UserListDto> userDtos = [];
 
         foreach (var user in users)
         {
-            var userDto = new UserDto
+            var userDto = new UserListDto
             {
                 Id = user.Id,
                 UserName = user.UserName ?? "",
@@ -46,6 +46,6 @@ public class GetUsersForDisplayQueryHandler(UserManager<ApplicationUser> userMan
         {
             totalCount = await userManager.Users.CountAsync(cancellationToken);
         }
-        return new PaginationResponse<UserDto>(userDtos, totalCount);
+        return new PaginationResponse<UserListDto>(userDtos, totalCount);
     }
 }
