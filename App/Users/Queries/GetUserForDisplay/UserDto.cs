@@ -14,5 +14,9 @@ public class UserDto
     public required string Phone { get; set; }
     public required bool PhoneConfirmed { get; set; }
 
+    public required bool TwoFactorEnabled { get; set; }
+
+    public string? BuildingId { get; set; }
+
     public List<string> Roles { get; set; } = [];
 }

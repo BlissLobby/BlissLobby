@@ -93,7 +93,7 @@ public class UpdateUserCommandHandler(UserManager<ApplicationUser> userManager) 
         // update building id
         if (user.BuildingId != request.BuildingId)
         {
-            user.BuildingId = request.BuildingId;
+            user.BuildingId = string.IsNullOrWhiteSpace(request.BuildingId) ? null : request.BuildingId;
             var res = await userManager.UpdateAsync(user);
             results.Add(res);
         }

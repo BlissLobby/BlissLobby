@@ -29,7 +29,10 @@
         <td class="rz-grid-col-text">@user.Email</td>
         <td class="rz-grid-col-text">@user.EmailConfirmed</td>
         <td class="rz-grid-col-text">@string.Join(", ", user.Roles)</td>
-        <td class="rz-grid-col-text"><a href="/Users/Details/@user.Id">View</a></td>
+        <td class="rz-grid-col-text">
+            <a href="/Users/Details/@user.Id">View</a>
+            <a href="/Users/Edit/@user.Id">Edit</a>
+        </td>
     </RowTemplate>
 
     <EmptyTemplate>
@@ -57,14 +60,14 @@
     {
         // Simulate asynchronous loading to check ui responsiveness
         // await Task.Delay(3000);
-        
+
         var (users, totalCount) = await mediator.Send(
-            new GetUsersForDisplayQuery(
-                new PaginationQuery(req.Page, req.PageSize, req.Filters,
-                                    req.SortBy, req.SortDesc, req.RequestNewCount
-                )
-            )
-        );
+                    new GetUsersForDisplayQuery(
+                        new PaginationQuery(req.Page, req.PageSize, req.Filters,
+                                            req.SortBy, req.SortDesc, req.RequestNewCount
+                        )
+                    )
+                );
         return new GridResponse<UserListDto>(users, totalCount);
     }
 }

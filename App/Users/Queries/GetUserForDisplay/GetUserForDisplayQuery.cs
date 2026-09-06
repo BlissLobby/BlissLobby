@@ -22,6 +22,8 @@ public class GetUserForDisplayQueryHandler(UserManager<ApplicationUser> userMana
             EmailConfirmed = user.EmailConfirmed,
             Phone = user.PhoneNumber ?? "",
             PhoneConfirmed = user.PhoneNumberConfirmed,
+            TwoFactorEnabled = user.TwoFactorEnabled,
+            BuildingId = user.BuildingId,
             Roles = [.. await userManager.GetRolesAsync(user)]
         } : null;
 

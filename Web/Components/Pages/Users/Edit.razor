@@ -1,6 +1,225 @@
-﻿<h3>Edit</h3>
-@* TODO complete this *@
+﻿@page "/Users/Edit/{Id}"
+
+@using App.Buildings.Queries.GetBuildings
+@using App.Users.Commands.UpdateUser
+@using Blazilla
+@using Domain.Entities
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Identity
+@using Web.Services
+
+@inject RedirectManager RedirectManager
+@inject IMediator mediator
+@inject StatusMessageService StatusMessage
+
+<PageTitle>Edit user</PageTitle>
+
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1">Edit User</RadzenText>
+@if (Input is null)
+{
+    <p><em>Loading user data...</em></p>
+}
+else if (Buildings is null)
+{
+    <p><em>Loading buildings data...</em></p>
+}
+else
+{
+    <RadzenRow Gap="1rem">
+        <RadzenColumn SizeSM="4">
+            <RadzenCard Variant="Variant.Flat" Class="rz-p-4 rz-p-lg-12">
+                <EditForm Enhance EditContext="editContext" method="post" OnSubmit="HandleSubmit" FormName="editUser">
+                    <FluentValidator AsyncMode="true" />
+                    <RadzenAlert Visible="@(editContext.GetValidationMessages().Any())"
+                                 AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter"
+                                 AllowClose="false">
+                        <ValidationSummary />
+                    </RadzenAlert>
+
+                    <RadzenStack Gap="1rem">
+                        <InputHidden @bind-Value="Input.Id" Name="Input.Id" />
+
+                        <RadzenFormField Text="Username" Variant="Variant.Outlined">
+                            <RadzenTextBox @bind-Value="Input.Username" Name="Input.Username" style="width: 100%;"
+                                           aria-required="true" />
+                        </RadzenFormField>
+                        <ValidationMessage For="() => Input.Username" class="rz-message rz-messages-error" />
+
+                        <RadzenFormField Text="Display Name" Variant="Variant.Outlined">
+                            <RadzenTextBox @bind-Value="Input.DisplayName" Name="Input.DisplayName" style="width: 100%;"
+                                           aria-required="true" />
+                        </RadzenFormField>
+                        <ValidationMessage For="() => Input.DisplayName" class="rz-message rz-messages-error" />
+
+                        <RadzenFormField Text="Email" Variant="Variant.Outlined">
+                            <RadzenTextBox @bind-Value="Input.Email" Name="Input.Email" style="width: 100%;"
+                                           aria-required="true" />
+                        </RadzenFormField>
+                        <ValidationMessage For="() => Input.Email" class="rz-message rz-messages-error" />
+
+                        <RadzenFormField Text="Phone Number (Optional)" Variant="Variant.Outlined">
+                            <RadzenTextBox @bind-Value="Input.PhoneNumber" Name="Input.PhoneNumber" style="width: 100%;"
+                                           aria-required="false" />
+                        </RadzenFormField>
+                        <ValidationMessage For="() => Input.PhoneNumber" class="rz-message rz-messages-error" />
+
+                        <RadzenFormField Text="Password" Variant="Variant.Outlined">
+                            <RadzenPassword @bind-Value="Input.Password" Name="Input.Password" style="width: 100%;"
+                                            aria-required="true" />
+                        </RadzenFormField>
+                        <ValidationMessage For="() => Input.Password" class="rz-message rz-messages-error" />
+
+                        <RadzenFormField Text="Confirm Password" Variant="Variant.Outlined">
+                            <RadzenPassword @bind-Value="Input.ConfirmPassword" Name="Input.ConfirmPassword" style="width: 100%;"
+                                            aria-required="true" />
+                        </RadzenFormField>
+                        <ValidationMessage For="() => Input.ConfirmPassword" class="rz-message rz-messages-error" />
+
+                        <RadzenFormField Text="User Role" Variant="Variant.Outlined">
+                            <select name="Input.UserRole" class="rz-dropdown rz-state-default w-100">
+                                <option value="">Select a Role...</option>
+                                @foreach (var role in Roles.GetRoles())
+                                {
+                                    if (!role.Equals(Roles.Administrator))
+                                    {
+                                        <option value="@role" selected="@(role == Input.UserRole)">@role</option>
+                                    }
+                                }
+                            </select>
+                        </RadzenFormField>
+                        <ValidationMessage For="() => Input.UserRole" class="rz-message rz-messages-error" />
+
+                        <div class="rz-display-flex rz-align-center rz-mb-4">
+                            <div class="rz-chkbox">
+                                @* Native checkbox for SSR interaction *@
+                                <InputCheckbox type="checkbox"
+                                               name="Input.IsTwoFactorEnabled"
+                                               @bind-Value="@Input.IsTwoFactorEnabled"
+                                               class="rz-chkbox-box" />
+                            </div>
+                            <label class="rz-label" for="Input.IsTwoFactorEnabled">Enable Two-Factor Authentication</label>
+                        </div>
+
+                        <div class="rz-display-flex rz-align-center rz-mb-4">
+                            <div class="rz-chkbox">
+                                @* Native checkbox for SSR interaction *@
+                                <InputCheckbox type="checkbox"
+                                               name="Input.IsEmailConfirmed"
+                                               @bind-Value="@Input.IsEmailConfirmed"
+                                               class="rz-chkbox-box" />
+                            </div>
+                            <label class="rz-label" for="Input.IsEmailConfirmed">Confirm Email</label>
+                        </div>
+
+                        <div class="rz-display-flex rz-align-center rz-mb-4">
+                            <div class="rz-chkbox">
+                                @* Native checkbox for SSR interaction *@
+                                <InputCheckbox type="checkbox"
+                                               name="Input.IsPhoneConfirmed"
+                                               @bind-Value="@Input.IsPhoneConfirmed"
+                                               class="rz-chkbox-box" />
+                            </div>
+                            <label class="rz-label" for="Input.IsPhoneConfirmed">Confirm Phone</label>
+                        </div>
+
+                        <RadzenFormField Text="Building" Variant="Variant.Outlined">
+                            <select name="Input.BuildingId" class="rz-dropdown rz-state-default w-100">
+                                @foreach (var building in Buildings)
+                                {
+                                    <option value="@building.Id" selected="@(building.Id == Input.BuildingId)">@building.Name</option>
+                                }
+                            </select>
+                        </RadzenFormField>
+                        <ValidationMessage For="() => Input.BuildingId" class="rz-message rz-messages-error" />
+
+                        <RadzenButton ButtonType="ButtonType.Submit" Text="Update User"
+                                      ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Large" FullWidth="true" />
+
+                    </RadzenStack>
+                </EditForm>
+            </RadzenCard>
+        </RadzenColumn>
+    </RadzenRow>
+}
+<p><a href="/users">Back to List</a></p>
+
+
 
 @code {
+    // id from url
+    [Parameter] public string Id { get; set; } = default!;
 
+    private EditContext editContext = default!;
+    private ValidationMessageStore? messageStore;
+
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
+
+    [SupplyParameterFromForm]
+    public UpdateUserCommand Input { get; set; } = default!;
+
+    [SupplyParameterFromQuery]
+    private string? ReturnUrl { get; set; }
+
+    public required IEnumerable<Building> Buildings { get; set; }
+
+    private async Task HandleSubmit()
+    {
+        // clear any previous model-level custom messages
+        messageStore?.Clear(new FieldIdentifier(Input, string.Empty));
+
+        var isValid = await editContext.ValidateAsync();
+        if (isValid)
+        {
+            List<IdentityResult> res = await mediator.Send(Input);
+            if (res.All(r => r.Succeeded))
+            {
+                RedirectManager.RedirectToWithStatus("/Users", $"Updated user with username {Input.Username}", Radzen.AlertStyle.Success);
+                return;
+            }
+
+            // Add custom string(s) to the ValidationSummary (model-level)
+            foreach (var error in res.SelectMany(r => r.Errors))
+            {
+                messageStore?.Add(new FieldIdentifier(Input, string.Empty), error.Description);
+            }
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // check if it is a post back or initial load
+        if (Input is null)
+        {
+            // get user for the given id
+            var user = await mediator.Send(new App.Users.Queries.GetUserForDisplay.GetUserForDisplayQuery(Id));
+
+            if (user == null)
+            {
+                RedirectManager.RedirectTo("/not-found", true);
+                return;
+            }
+
+            // Map user data to Input model
+            Input = new UpdateUserCommand
+            {
+                Id = user.Id,
+                Username = user.UserName,
+                DisplayName = user.DisplayName,
+                Email = user.Email,
+                PhoneNumber = user.Phone,
+                UserRole = user.Roles.FirstOrDefault() ?? "",
+                BuildingId = user.BuildingId,
+                IsTwoFactorEnabled = user.TwoFactorEnabled,
+                IsEmailConfirmed = user.EmailConfirmed,
+                IsPhoneConfirmed = user.PhoneConfirmed
+            };
+        }
+
+        Buildings = (await mediator.Send(new GetBuildingsQuery()))
+                                    .Append(new Building() { Id = "", Name = "Select a Building..." }).ToList();
+
+        editContext = new EditContext(Input);
+        messageStore = new ValidationMessageStore(editContext);
+    }
 }
