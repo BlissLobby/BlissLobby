@@ -1,8 +1,5 @@
-﻿using App.Common.Interfaces;
-using App.Users.Interfaces;
-using Domain.Entities;
+﻿using Domain.Entities;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Logging;
 
 namespace App.Users.Commands.UpdateUser;
 

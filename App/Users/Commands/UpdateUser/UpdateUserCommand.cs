@@ -1,5 +1,4 @@
 ﻿using Domain.Constants;
-using Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 
 namespace App.Users.Commands.UpdateUser;

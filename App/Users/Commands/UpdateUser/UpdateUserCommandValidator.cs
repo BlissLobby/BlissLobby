@@ -1,5 +1,4 @@
 ﻿using App.Common.Interfaces;
-using App.Utils;
 using App.Utils.FluentValidation;
 
 namespace App.Users.Commands.UpdateUser;
