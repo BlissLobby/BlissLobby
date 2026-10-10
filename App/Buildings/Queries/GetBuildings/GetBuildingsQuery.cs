@@ -1,10 +1,11 @@
 ﻿using App.Common.Interfaces;
 using App.Common.Security;
+using Domain.Constants;
 using Domain.Entities;
 
 namespace App.Buildings.Queries.GetBuildings;
 
-[Authorize]
+[Authorize(Roles = $"{Roles.Administrator},{Roles.ClusterAdmin}")]
 public record GetBuildingsQuery : IRequest<List<Building>>;
 
 public class GetBuildingsQueryHandler(IApplicationDbContext dbContext) : IRequestHandler<GetBuildingsQuery, List<Building>>

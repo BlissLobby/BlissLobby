@@ -1,0 +1,66 @@
+@page "/Clusters"
+@attribute [StreamRendering]
+
+@using App.Common.Pagination
+@using App.Clusters.Queries.GetClustersForDisplay
+@using Nagasudhir.SmartStaticGrid.Components
+@using Nagasudhir.SmartStaticGrid.Models
+
+@inject IMediator mediator
+
+<PageTitle>Clusters</PageTitle>
+
+<h1>Clusters</h1>
+
+<SmartStaticGrid Id="RadzenStyledClusters"
+                 TItem="ClusterListDto"
+                 Columns="clusterCols"
+                 DataProvider="LoadClusters"
+                 TableClass="rz-grid-table rz-datatable"
+                 HeaderClass="rz-column-title"
+                 RowClass="rz-datatable-even"
+                 PagerContainerClass="rz-paginator"
+                 PageSizeOptions=@(new int[] {10,20,50})>
+
+    <RowTemplate Context="cluster">
+        <td class="rz-grid-col-text">@cluster.Name</td>
+        <td class="rz-grid-col-text">@cluster.Description</td>
+        <td class="rz-grid-col-text">@string.Join(", ", cluster.AdminNames)</td>
+        <td class="rz-grid-col-text">
+            <a href="/Clusters/Details/@cluster.Id">View</a>
+            <a href="/Clusters/Edit/@cluster.Id">Edit</a>
+            <a href="/Clusters/Delete/@cluster.Id">Delete</a>
+        </td>
+    </RowTemplate>
+
+    <EmptyTemplate>
+        <div class="rz-p-12 rz-text-align-center">
+            <RadzenIcon Icon="find_in_page" Style="font-size: 3rem;" />
+            <p>No clusters found.</p>
+        </div>
+    </EmptyTemplate>
+
+</SmartStaticGrid>
+
+<p><a href="/Clusters/Create">Create New Cluster</a></p>
+
+@code {
+    public static readonly List<ColumnDef> clusterCols = [
+        new(nameof(ClusterListDto.Name), "Name", Searchable: true),
+        new(nameof(ClusterListDto.Description), "Description", Searchable: true),
+        new(nameof(ClusterListDto.AdminNames), "Admins", Searchable: true),
+        new("Actions", "Actions", Searchable: false),
+    ];
+
+    private async Task<GridResponse<ClusterListDto>> LoadClusters(GridRequest req)
+    {
+        var (clusters, totalCount) = await mediator.Send(
+                    new GetClustersForDisplayQuery(
+                        new PaginationQuery(req.Page, req.PageSize, req.Filters,
+                                            req.SortBy, req.SortDesc, req.RequestNewCount
+                        )
+                    )
+                );
+        return new GridResponse<ClusterListDto>(clusters, totalCount);
+    }
+}

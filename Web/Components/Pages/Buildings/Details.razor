@@ -1,0 +1,78 @@
+@page "/Buildings/Details/{Id}"
+
+@using App.Buildings.Queries.GetBuildingForDisplay
+@using Web.Services
+
+@inject IMediator mediator
+@inject RedirectManager RedirectManager
+
+
+<PageTitle>Building Details</PageTitle>
+
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="rz-mb-4">
+    Building Details
+</RadzenText>
+
+@if (Building == null)
+{
+    <p>Please wait...</p>
+}
+else
+{
+    <RadzenCard Class="rz-my-6 rz-mx-auto" Style="max-width: 600px;">
+        <RadzenStack Gap="1rem">
+            <div>
+                <RadzenText TextStyle="TextStyle.Overline" Class="rz-display-flex rz-mt-2 rz-mb-0">Name</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body1"><b>@Building.Name</b></RadzenText>
+            </div>
+            <div>
+                <RadzenText TextStyle="TextStyle.Overline" Class="rz-display-flex rz-mt-2 rz-mb-0">Address</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body1"><b>@Building.Address</b></RadzenText>
+            </div>
+            <div>
+                <RadzenText TextStyle="TextStyle.Overline" Class="rz-display-flex rz-mt-2 rz-mb-0">City</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body1"><b>@Building.City</b></RadzenText>
+            </div>
+            <div>
+                <RadzenText TextStyle="TextStyle.Overline" Class="rz-display-flex rz-mt-2 rz-mb-0">State</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body1"><b>@Building.State</b></RadzenText>
+            </div>
+            <div>
+                <RadzenText TextStyle="TextStyle.Overline" Class="rz-display-flex rz-mt-2 rz-mb-0">Zip Code</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body1"><b>@Building.ZipCode</b></RadzenText>
+            </div>
+            <div>
+                <RadzenText TextStyle="TextStyle.Overline" Class="rz-display-flex rz-mt-2 rz-mb-0">Country</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body1"><b>@Building.Country</b></RadzenText>
+            </div>
+            @if (!string.IsNullOrEmpty(Building.Description))
+            {
+                <div>
+                    <RadzenText TextStyle="TextStyle.Overline" Class="rz-display-flex rz-mt-2 rz-mb-0">Description</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body1"><b>@Building.Description</b></RadzenText>
+                </div>
+            }
+        </RadzenStack>
+    </RadzenCard>
+}
+
+<p><a href="/Buildings">Back to Buildings</a></p>
+
+@code {
+    [Parameter]
+    public required string Id { get; set; }
+
+    public BuildingDto Building { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var building = await mediator.Send(new GetBuildingForDisplayQuery(Id));
+
+        if (building == null)
+        {
+            RedirectManager.RedirectTo("/not-found", true);
+            return;
+        }
+        Building = building;
+    }
+}

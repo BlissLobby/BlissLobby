@@ -1,0 +1,70 @@
+@page "/Buildings"
+@attribute [StreamRendering]
+
+@using App.Common.Pagination
+@using App.Buildings.Queries.GetBuildingsForDisplay
+@using Nagasudhir.SmartStaticGrid.Components
+@using Nagasudhir.SmartStaticGrid.Models
+
+@inject IMediator mediator
+
+<PageTitle>Buildings</PageTitle>
+
+<h1>Buildings</h1>
+
+<SmartStaticGrid Id="RadzenStyledBuildings"
+                 TItem="BuildingListDto"
+                 Columns="buildingCols"
+                 DataProvider="LoadBuildings"
+                 TableClass="rz-grid-table rz-datatable"
+                 HeaderClass="rz-column-title"
+                 RowClass="rz-datatable-even"
+                 PagerContainerClass="rz-paginator"
+                 PageSizeOptions=@(new int[] {10,20,50})>
+
+    <RowTemplate Context="building">
+        <td class="rz-grid-col-text">@building.Name</td>
+        <td class="rz-grid-col-text">@building.Address</td>
+        <td class="rz-grid-col-text">@building.City</td>
+        <td class="rz-grid-col-text">@building.State</td>
+        <td class="rz-grid-col-text">@building.ClusterName</td>
+        <td class="rz-grid-col-text">
+            <a href="/Buildings/Details/@building.Id">View</a>
+            <a href="/Buildings/Edit/@building.Id">Edit</a>
+            <a href="/Buildings/Delete/@building.Id">Delete</a>
+        </td>
+    </RowTemplate>
+
+    <EmptyTemplate>
+        <div class="rz-p-12 rz-text-align-center">
+            <RadzenIcon Icon="find_in_page" Style="font-size: 3rem;" />
+            <p>No buildings found.</p>
+        </div>
+    </EmptyTemplate>
+
+</SmartStaticGrid>
+
+<p><a href="/Buildings/Create">Create New Building</a></p>
+
+@code {
+    public static readonly List<ColumnDef> buildingCols = [
+        new(nameof(BuildingListDto.Name), "Name", Searchable: true),
+        new(nameof(BuildingListDto.Address), "Address", Searchable: true),
+        new(nameof(BuildingListDto.City), "City", Searchable: true),
+        new(nameof(BuildingListDto.State), "State", Searchable: false),
+        new(nameof(BuildingListDto.ClusterName), "Cluster", Searchable: false),
+        new("Actions", "Actions", Searchable: false),
+    ];
+
+    private async Task<GridResponse<BuildingListDto>> LoadBuildings(GridRequest req)
+    {
+        var (buildings, totalCount) = await mediator.Send(
+                    new GetBuildingsForDisplayQuery(
+                        new PaginationQuery(req.Page, req.PageSize, req.Filters,
+                                            req.SortBy, req.SortDesc, req.RequestNewCount
+                        )
+                    )
+                );
+        return new GridResponse<BuildingListDto>(buildings, totalCount);
+    }
+}

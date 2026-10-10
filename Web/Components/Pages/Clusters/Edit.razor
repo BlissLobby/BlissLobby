@@ -1,0 +1,121 @@
+@page "/Clusters/Edit/{Id}"
+
+@using App.Clusters.Commands.UpdateCluster
+@using App.Clusters.Queries.GetClusterForDisplay
+@using Blazilla
+@using Microsoft.AspNetCore.Components.Forms
+@using Web.Services
+
+@inject RedirectManager RedirectManager
+@inject IMediator mediator
+@inject StatusMessageService StatusMessage
+
+<PageTitle>Edit Cluster</PageTitle>
+
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1">Edit Cluster</RadzenText>
+@if (Input is null)
+{
+    <p><em>Loading cluster data...</em></p>
+}
+else
+{
+    <RadzenRow Gap="1rem">
+        <RadzenColumn SizeSM="4">
+            <RadzenCard Variant="Variant.Flat" Class="rz-p-4 rz-p-lg-12">
+                <EditForm Enhance EditContext="editContext" method="post" OnSubmit="HandleSubmit" FormName="editCluster">
+                    <FluentValidator AsyncMode="true" />
+                    <RadzenAlert Visible="@(editContext.GetValidationMessages().Any())"
+                                 AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter"
+                                 AllowClose="false">
+                        <ValidationSummary />
+                    </RadzenAlert>
+
+                    <RadzenStack Gap="1rem">
+                        <InputHidden @bind-Value="Input.Id" Name="Input.Id" />
+
+                        <RadzenFormField Text="Name" Variant="Variant.Outlined">
+                            <RadzenTextBox @bind-Value="Input.Name" Name="Input.Name" style="width: 100%;"
+                                           aria-required="true" />
+                        </RadzenFormField>
+                        <ValidationMessage For="() => Input.Name" class="rz-message rz-messages-error" />
+
+                        <RadzenFormField Text="Description (Optional)" Variant="Variant.Outlined">
+                            <RadzenTextArea @bind-Value="Input.Description" Name="Input.Description" style="width: 100%;"
+                                            aria-required="false" />
+                        </RadzenFormField>
+                        <ValidationMessage For="() => Input.Description" class="rz-message rz-messages-error" />
+
+                        <RadzenButton ButtonType="ButtonType.Submit" Text="Update Cluster"
+                                      ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Large" FullWidth="true" />
+
+                    </RadzenStack>
+                </EditForm>
+            </RadzenCard>
+        </RadzenColumn>
+    </RadzenRow>
+}
+<p><a href="/clusters">Back to List</a></p>
+
+@code {
+    // id from url
+    [Parameter] public string Id { get; set; } = default!;
+
+    private EditContext editContext = default!;
+    private ValidationMessageStore? messageStore;
+
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
+
+    [SupplyParameterFromForm]
+    public UpdateClusterCommand Input { get; set; } = default!;
+
+    [SupplyParameterFromQuery]
+    private string? ReturnUrl { get; set; }
+
+    private async Task HandleSubmit()
+    {
+        // clear any previous model-level custom messages
+        messageStore?.Clear(new FieldIdentifier(Input, string.Empty));
+
+        var isValid = await editContext.ValidateAsync();
+        if (isValid)
+        {
+            bool result = await mediator.Send(Input);
+            if (result)
+            {
+                RedirectManager.RedirectToWithStatus("/Clusters", $"Updated cluster '{Input.Name}'", Radzen.AlertStyle.Success);
+                return;
+            }
+
+            // Add error message if update failed
+            messageStore?.Add(new FieldIdentifier(Input, string.Empty), "Failed to update cluster. Please try again.");
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // check if it is a post back or initial load
+        if (Input is null)
+        {
+            // get cluster for the given id
+            var cluster = await mediator.Send(new GetClusterForDisplayQuery(Id));
+
+            if (cluster == null)
+            {
+                RedirectManager.RedirectTo("/not-found", true);
+                return;
+            }
+
+            // Map cluster data to Input model
+            Input = new UpdateClusterCommand
+            {
+                Id = cluster.Id,
+                Name = cluster.Name,
+                Description = cluster.Description
+            };
+        }
+
+        editContext = new EditContext(Input);
+        messageStore = new ValidationMessageStore(editContext);
+    }
+}

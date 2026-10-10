@@ -1,0 +1,101 @@
+@page "/Buildings/Delete/{Id}"
+
+@using App.Buildings.Queries.GetBuildingForDisplay
+@using App.Buildings.Commands.DeleteBuilding
+@using Web.Services
+
+@inject IMediator mediator
+@inject RedirectManager RedirectManager
+
+<PageTitle>Delete Building</PageTitle>
+
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="rz-mb-4">
+    Delete Building
+</RadzenText>
+
+@if (Input == null)
+{
+    <p>Please wait...</p>
+}
+else
+{
+    <RadzenCard Class="rz-my-6 rz-mx-auto" Style="max-width: 600px;">
+        <RadzenAlert AlertStyle="AlertStyle.Warning" Variant="Variant.Flat" Shade="Shade.Lighter" AllowClose="false" Class="rz-mb-4">
+            <RadzenText TextStyle="TextStyle.Body2">
+                <strong>Warning:</strong> This action cannot be undone. Are you sure you want to delete this building?
+            </RadzenText>
+        </RadzenAlert>
+
+        <RadzenStack Gap="1rem" Class="rz-mb-4">
+            <div>
+                <RadzenText TextStyle="TextStyle.Overline" Class="rz-display-flex rz-mt-2 rz-mb-0">Name</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body1"><b>@Input.Name</b></RadzenText>
+            </div>
+            <div>
+                <RadzenText TextStyle="TextStyle.Overline" Class="rz-display-flex rz-mt-2 rz-mb-0">Address</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body1"><b>@Input.Address</b></RadzenText>
+            </div>
+            <div>
+                <RadzenText TextStyle="TextStyle.Overline" Class="rz-display-flex rz-mt-2 rz-mb-0">City</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body1"><b>@Input.City</b></RadzenText>
+            </div>
+            <div>
+                <RadzenText TextStyle="TextStyle.Overline" Class="rz-display-flex rz-mt-2 rz-mb-0">State</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body1"><b>@Input.State</b></RadzenText>
+            </div>
+        </RadzenStack>
+
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem" JustifyContent="JustifyContent.End" AlignItems="AlignItems.Center">
+            <RadzenButton Click="@(() => RedirectManager.RedirectTo("/Buildings"))" 
+                          Text="Cancel" 
+                          ButtonStyle="ButtonStyle.Secondary" 
+                          Size="ButtonSize.Large" />
+            <EditForm Enhance Model="Input" method="post" OnSubmit="HandleDelete" FormName="deleteBuilding">
+                <InputHidden @bind-Value="Input.Id" Name="Building.Id" />
+                <InputHidden @bind-Value="Input.Name" Name="Building.Name" />
+                <RadzenButton ButtonType="ButtonType.Submit" 
+                              Text="Delete Building" 
+                              ButtonStyle="ButtonStyle.Danger" 
+                              Size="ButtonSize.Large" />
+            </EditForm>
+        </RadzenStack>
+    </RadzenCard>
+}
+
+<p><a href="/Buildings">Back to Buildings</a></p>
+
+@code {
+    [Parameter]
+    public required string Id { get; set; }
+
+    [SupplyParameterFromForm]
+    public BuildingDto Input { get; set; } = default!;
+
+    private async Task HandleDelete()
+    {
+        var result = await mediator.Send(new DeleteBuildingCommand(Input.Id));
+
+        if (result)
+        {
+            RedirectManager.RedirectToWithStatus("/Buildings", $"Building '{Input.Name}' has been deleted successfully", Radzen.AlertStyle.Success);
+        }
+        else
+        {
+            // Handle error case if needed
+            RedirectManager.RedirectToWithStatus("/Error", "An error occurred while deleting the building.", Radzen.AlertStyle.Danger);
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var building = await mediator.Send(new GetBuildingForDisplayQuery(Id));
+
+        if (building == null)
+        {
+            RedirectManager.RedirectTo("/not-found", true);
+            return;
+        }
+
+        Input = building;
+    }
+}

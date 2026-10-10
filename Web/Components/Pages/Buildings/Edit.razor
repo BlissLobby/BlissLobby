@@ -1,0 +1,180 @@
+@page "/Buildings/Edit/{Id}"
+
+@using App.Buildings.Commands.UpdateBuilding
+@using App.Buildings.Queries.GetBuildingForDisplay
+@using App.Clusters.Queries.GetClusters
+@using Blazilla
+@using Domain.Entities
+@using Microsoft.AspNetCore.Components.Forms
+@using Web.Services
+
+@inject RedirectManager RedirectManager
+@inject IMediator mediator
+@inject StatusMessageService StatusMessage
+
+<PageTitle>Edit Building</PageTitle>
+
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1">Edit Building</RadzenText>
+@if (Input is null)
+{
+    <p><em>Loading building data...</em></p>
+}
+else if (Clusters is null)
+{
+    <p><em>Loading clusters data...</em></p>
+}
+else
+{
+    <RadzenRow Gap="1rem">
+        <RadzenColumn SizeSM="4">
+            <RadzenCard Variant="Variant.Flat" Class="rz-p-4 rz-p-lg-12">
+                <EditForm Enhance EditContext="editContext" method="post" OnSubmit="HandleSubmit" FormName="editBuilding">
+                    <FluentValidator AsyncMode="true" />
+                    <RadzenAlert Visible="@(editContext.GetValidationMessages().Any())"
+                                 AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter"
+                                 AllowClose="false">
+                        <ValidationSummary />
+                    </RadzenAlert>
+
+                    <RadzenStack Gap="1rem">
+                        <InputHidden @bind-Value="Input.Id" Name="Input.Id" />
+
+                        <RadzenFormField Text="Name" Variant="Variant.Outlined">
+                            <RadzenTextBox @bind-Value="Input.Name" Name="Input.Name" style="width: 100%;"
+                                           aria-required="true" />
+                        </RadzenFormField>
+                        <ValidationMessage For="() => Input.Name" class="rz-message rz-messages-error" />
+
+                        <RadzenFormField Text="Address" Variant="Variant.Outlined">
+                            <RadzenTextBox @bind-Value="Input.Address" Name="Input.Address" style="width: 100%;"
+                                           aria-required="true" />
+                        </RadzenFormField>
+                        <ValidationMessage For="() => Input.Address" class="rz-message rz-messages-error" />
+
+                        <RadzenFormField Text="City" Variant="Variant.Outlined">
+                            <RadzenTextBox @bind-Value="Input.City" Name="Input.City" style="width: 100%;"
+                                           aria-required="true" />
+                        </RadzenFormField>
+                        <ValidationMessage For="() => Input.City" class="rz-message rz-messages-error" />
+
+                        <RadzenFormField Text="State" Variant="Variant.Outlined">
+                            <RadzenTextBox @bind-Value="Input.State" Name="Input.State" style="width: 100%;"
+                                           aria-required="true" />
+                        </RadzenFormField>
+                        <ValidationMessage For="() => Input.State" class="rz-message rz-messages-error" />
+
+                        <RadzenFormField Text="Zip Code" Variant="Variant.Outlined">
+                            <RadzenTextBox @bind-Value="Input.ZipCode" Name="Input.ZipCode" style="width: 100%;"
+                                           aria-required="true" />
+                        </RadzenFormField>
+                        <ValidationMessage For="() => Input.ZipCode" class="rz-message rz-messages-error" />
+
+                        <RadzenFormField Text="Country" Variant="Variant.Outlined">
+                            <RadzenTextBox @bind-Value="Input.Country" Name="Input.Country" style="width: 100%;"
+                                           aria-required="true" />
+                        </RadzenFormField>
+                        <ValidationMessage For="() => Input.Country" class="rz-message rz-messages-error" />
+
+                        <RadzenFormField Text="Description (Optional)" Variant="Variant.Outlined">
+                            <RadzenTextArea @bind-Value="Input.Description" Name="Input.Description" style="width: 100%;"
+                                            aria-required="false" />
+                        </RadzenFormField>
+                        <ValidationMessage For="() => Input.Description" class="rz-message rz-messages-error" />
+
+                        <RadzenFormField Text="Cluster" Variant="Variant.Outlined">
+                            <select name="Input.ClusterId" class="rz-dropdown rz-state-default w-100">
+                                <option value="">Select a Cluster...</option>
+                                @foreach (var cluster in Clusters)
+                                {
+                                    <option value="@cluster.Id" selected="@(cluster.Id == Input.ClusterId)">@cluster.Name</option>
+                                }
+                            </select>
+                        </RadzenFormField>
+                        <ValidationMessage For="() => Input.ClusterId" class="rz-message rz-messages-error" />
+
+                        <RadzenButton ButtonType="ButtonType.Submit" Text="Update Building"
+                                      ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Large" FullWidth="true" />
+
+                    </RadzenStack>
+                </EditForm>
+            </RadzenCard>
+        </RadzenColumn>
+    </RadzenRow>
+}
+<p><a href="/buildings">Back to List</a></p>
+
+
+
+@code {
+    // id from url
+    [Parameter] public string Id { get; set; } = default!;
+
+    private EditContext editContext = default!;
+    private ValidationMessageStore? messageStore;
+
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
+
+    [SupplyParameterFromForm]
+    public UpdateBuildingCommand Input { get; set; } = default!;
+
+    [SupplyParameterFromQuery]
+    private string? ReturnUrl { get; set; }
+
+    public required IEnumerable<Cluster> Clusters { get; set; }
+
+    private async Task HandleSubmit()
+    {
+        // clear any previous model-level custom messages
+        messageStore?.Clear(new FieldIdentifier(Input, string.Empty));
+
+        var isValid = await editContext.ValidateAsync();
+        if (isValid)
+        {
+            bool result = await mediator.Send(Input);
+            if (result)
+            {
+                RedirectManager.RedirectToWithStatus("/Buildings", $"Updated building '{Input.Name}'", Radzen.AlertStyle.Success);
+                return;
+            }
+
+            // Add error message if update failed
+            messageStore?.Add(new FieldIdentifier(Input, string.Empty), "Failed to update building. Please try again.");
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // check if it is a post back or initial load
+        if (Input is null)
+        {
+            // get building for the given id
+            var building = await mediator.Send(new GetBuildingForDisplayQuery(Id));
+
+            if (building == null)
+            {
+                RedirectManager.RedirectTo("/not-found", true);
+                return;
+            }
+
+            // Map building data to Input model
+            Input = new UpdateBuildingCommand
+            {
+                Id = building.Id,
+                ClusterId = building.ClusterId,
+                Name = building.Name,
+                Address = building.Address,
+                City = building.City,
+                State = building.State,
+                ZipCode = building.ZipCode,
+                Country = building.Country,
+                Description = building.Description
+            };
+        }
+
+        Clusters = await mediator.Send(new GetClustersQuery());
+
+        editContext = new EditContext(Input);
+        messageStore = new ValidationMessageStore(editContext);
+    }
+}

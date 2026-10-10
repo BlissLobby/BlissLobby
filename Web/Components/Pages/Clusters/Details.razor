@@ -1,0 +1,61 @@
+@page "/Clusters/Details/{Id}"
+
+@using App.Clusters.Queries.GetClusterForDisplay
+@using Web.Services
+
+@inject IMediator mediator
+@inject RedirectManager RedirectManager
+
+<PageTitle>Cluster Details</PageTitle>
+
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="rz-mb-4">
+    Cluster Details
+</RadzenText>
+
+@if (Cluster == null)
+{
+    <p>Please wait...</p>
+}
+else
+{
+    <RadzenCard Class="rz-my-6 rz-mx-auto" Style="max-width: 600px;">
+        <RadzenStack Gap="1rem">
+            <div>
+                <RadzenText TextStyle="TextStyle.Overline" Class="rz-display-flex rz-mt-2 rz-mb-0">Name</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body1"><b>@Cluster.Name</b></RadzenText>
+            </div>
+            @if (!string.IsNullOrEmpty(Cluster.Description))
+            {
+                <div>
+                    <RadzenText TextStyle="TextStyle.Overline" Class="rz-display-flex rz-mt-2 rz-mb-0">Description</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body1"><b>@Cluster.Description</b></RadzenText>
+                </div>
+            }
+            <div>
+                <RadzenText TextStyle="TextStyle.Overline" Class="rz-display-flex rz-mt-2 rz-mb-0">Admins</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body1"><b>@string.Join(", ", Cluster.AdminNames)</b></RadzenText>
+            </div>
+        </RadzenStack>
+    </RadzenCard>
+}
+
+<p><a href="/Clusters">Back to Clusters</a></p>
+
+@code {
+    [Parameter]
+    public required string Id { get; set; }
+
+    public ClusterDto Cluster { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var cluster = await mediator.Send(new GetClusterForDisplayQuery(Id));
+
+        if (cluster == null)
+        {
+            RedirectManager.RedirectTo("/not-found", true);
+            return;
+        }
+        Cluster = cluster;
+    }
+}
