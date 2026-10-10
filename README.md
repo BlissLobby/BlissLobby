@@ -238,7 +238,7 @@ Visitor Management System for office spaces. Can also be used for residential sp
 * Note: The Notification entity is designed to store notifications related to visits, such as visit check-ins, check-outs, invite approvals, and rejections. The RecipientId field allows for efficient querying of notifications for a specific user, while the VisitId field allows for tracking notifications related to a specific visit. The IsRead field can be used to filter unread notifications for users, and the CreatedAt field can be used for sorting and retention purposes. A retention plan can be implemented to automatically delete notifications after a certain period (e.g., 365 days) to manage storage and comply with data retention policies.
 
 # TODOs
-* Buildings CRUD to be customized to accommodate ClusterAdmins so that they can only manage buildings in their clusters. Create Building action by a cluster admin should automatically associate the building with the cluster of the cluster admin.
+* Buildings LIST, VIEW pages should be accessible to ClusterAdmin also, but they should only see buildings in their cluster.
 * Use islands of interactivity in blazor ssr pages to improve performance and reduce server load where data loading is involved for form submission and data display
 * Create logout screen
 * Ensure Roles are created during db initialization, also fix the db initialization strategy to avoid data loss during development
