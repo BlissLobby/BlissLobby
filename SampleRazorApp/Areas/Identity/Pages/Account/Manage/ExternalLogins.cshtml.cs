@@ -59,9 +59,7 @@ namespace SampleRazorApp.Areas.Identity.Pages.Account.Manage
             }
 
             CurrentLogins = await _userManager.GetLoginsAsync(user);
-            OtherLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync())
-                .Where(auth => CurrentLogins.All(ul => auth.Name != ul.LoginProvider))
-                .ToList();
+            OtherLogins = [.. (await _signInManager.GetExternalAuthenticationSchemesAsync()).Where(auth => CurrentLogins.All(ul => auth.Name != ul.LoginProvider))];
 
             string passwordHash = null;
             if (_userStore is IUserPasswordStore<IdentityUser> userPasswordStore)

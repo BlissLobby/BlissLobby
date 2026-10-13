@@ -1,0 +1,116 @@
+@page "/Clusters/Admins/Create/{ClusterId}"
+
+@using App.Clusters.Commands.CreateClusterAdmin
+@using App.Clusters.Queries.GetClusterForDisplay
+@using App.Clusters.Queries.GetClusterAdminUsers
+@using Blazilla
+@using Microsoft.AspNetCore.Components.Forms
+@using Web.Services
+
+@inject RedirectManager RedirectManager
+@inject IMediator mediator
+
+<PageTitle>Add Cluster Admin</PageTitle>
+
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1">Add Cluster Admin</RadzenText>
+@if (Cluster is null || Users is null)
+{
+    <p><em>Loading cluster admin data...</em></p>
+}
+else
+{
+    <RadzenRow Gap="1rem">
+        <RadzenColumn SizeSM="4">
+            <RadzenCard Variant="Variant.Flat" Class="rz-p-4 rz-p-lg-12">
+                <EditForm Enhance EditContext="editContext" method="post" OnSubmit="HandleSubmit" FormName="createClusterAdmin">
+                    <FluentValidator AsyncMode="true" />
+                    <RadzenAlert Visible="@(editContext.GetValidationMessages().Any())"
+                                 AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter"
+                                 AllowClose="false">
+                        <ValidationSummary />
+                    </RadzenAlert>
+
+                    <RadzenStack Gap="1rem">
+                        <RadzenText TextStyle="TextStyle.Body1">Cluster: <strong>@Cluster.Name</strong></RadzenText>
+                        <InputHidden @bind-Value="Input.ClusterId" Name="Input.ClusterId" />
+
+                        <RadzenFormField Text="User" Variant="Variant.Outlined">
+                            <select name="Input.AdminId" class="rz-dropdown rz-state-default w-100">
+                                <option value="">Select a User...</option>
+                                @foreach (var user in Users)
+                                {
+                                    <option value="@user.Id" selected="@(user.Id == Input.AdminId)">@user.DisplayName (@user.UserName)</option>
+                                }
+                            </select>
+                        </RadzenFormField>
+                        <ValidationMessage For="() => Input.AdminId" class="rz-message rz-messages-error" />
+
+                        @if (Users.Count == 0)
+                        {
+                            <p>There are no available users to add as cluster admins.</p>
+                        }
+
+                        <RadzenButton ButtonType="ButtonType.Submit" Text="Add Cluster Admin"
+                                      ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Large" FullWidth="true"
+                                      Disabled="@(Users.Count == 0)" />
+                    </RadzenStack>
+                </EditForm>
+            </RadzenCard>
+        </RadzenColumn>
+    </RadzenRow>
+}
+<p><a href="/Clusters/Edit/@ClusterId">Back to Cluster</a></p>
+
+@code {
+    [Parameter] public string ClusterId { get; set; } = default!;
+
+    [SupplyParameterFromForm]
+    private CreateClusterAdminCommand Input { get; set; } = default!;
+
+    private EditContext editContext = default!;
+    private ValidationMessageStore? messageStore;
+    private ClusterDto? Cluster { get; set; }
+    private List<ClusterAdminUserDto>? Users { get; set; }
+
+    private async Task HandleSubmit()
+    {
+        messageStore?.Clear(new FieldIdentifier(Input, string.Empty));
+
+        if (!await editContext.ValidateAsync())
+            return;
+
+        Input.ClusterId = ClusterId;
+        var result = await mediator.Send(Input);
+        if (result)
+        {
+            RedirectManager.RedirectToWithStatus(
+                $"/Clusters/Edit/{ClusterId}",
+                "Added user as a cluster admin",
+                Radzen.AlertStyle.Success);
+            return;
+        }
+
+        messageStore?.Add(
+            new FieldIdentifier(Input, string.Empty),
+            "Failed to add this user as a cluster admin. The cluster or user may no longer be available, or the user is already an admin.");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Cluster = await mediator.Send(new GetClusterForDisplayQuery(ClusterId));
+        if (Cluster == null)
+        {
+            RedirectManager.RedirectTo("/not-found", true);
+            return;
+        }
+
+        var users = await mediator.Send(new GetClusterAdminUsersQuery());
+        var assignedAdminIds = Cluster.ClusterAdmins.Select(admin => admin.AdminId).ToHashSet();
+        Users = users.Where(user => !assignedAdminIds.Contains(user.Id)).ToList();
+
+        Input ??= new CreateClusterAdminCommand();
+        Input.ClusterId = ClusterId;
+        editContext = new EditContext(Input);
+        messageStore = new ValidationMessageStore(editContext);
+    }
+}

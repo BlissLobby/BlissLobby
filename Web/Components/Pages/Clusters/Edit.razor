@@ -53,6 +53,38 @@ else
             </RadzenCard>
         </RadzenColumn>
     </RadzenRow>
+
+    <RadzenStack Gap="1rem" Class="rz-mt-4">
+        <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H2">Cluster Admins</RadzenText>
+        <p>
+            <a href="/Clusters/Admins/Create/@Input.Id" class="rz-button rz-button-md rz-variant-filled rz-primary">
+                Add Cluster Admin
+            </a>
+        </p>
+        <table class="rz-grid-table rz-datatable">
+            <thead>
+                <tr>
+                    <th>Cluster Admin</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var clusterAdmin in clusterAdmins)
+                {
+                    <tr>
+                        <td>@clusterAdmin.AdminDisplayName</td>
+                        <td><a href="/Clusters/Admins/Delete/@clusterAdmin.Id">Delete</a></td>
+                    </tr>
+                }
+                @if (clusterAdmins.Count == 0)
+                {
+                    <tr>
+                        <td colspan="2">No cluster admins have been assigned.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </RadzenStack>
 }
 <p><a href="/clusters">Back to List</a></p>
 
@@ -71,6 +103,8 @@ else
 
     [SupplyParameterFromQuery]
     private string? ReturnUrl { get; set; }
+
+    private List<ClusterAdminDto> clusterAdmins = [];
 
     private async Task HandleSubmit()
     {
@@ -94,18 +128,18 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        var cluster = await mediator.Send(new GetClusterForDisplayQuery(Id));
+        if (cluster == null)
+        {
+            RedirectManager.RedirectTo("/not-found", true);
+            return;
+        }
+
+        clusterAdmins = cluster.ClusterAdmins;
+
         // check if it is a post back or initial load
         if (Input is null)
         {
-            // get cluster for the given id
-            var cluster = await mediator.Send(new GetClusterForDisplayQuery(Id));
-
-            if (cluster == null)
-            {
-                RedirectManager.RedirectTo("/not-found", true);
-                return;
-            }
-
             // Map cluster data to Input model
             Input = new UpdateClusterCommand
             {

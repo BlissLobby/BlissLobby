@@ -15,17 +15,28 @@ public class GetClusterForDisplayQueryHandler(IApplicationDbContext dbContext) :
             .FirstOrDefaultAsync(c => c.Id == clusterQuery.Id, cancellationToken);
 
 
-        ClusterDto? clusterDto = cluster != null ? new ClusterDto()
+        if (cluster == null)
+            return null;
+
+        var clusterAdmins = await dbContext.ClusterAdmins
+            .AsNoTracking()
+            .Where(ca => ca.ClusterId == cluster.Id)
+            .Include(ca => ca.Admin)
+            .ToListAsync(cancellationToken);
+
+        ClusterDto clusterDto = new()
         {
             Id = cluster.Id,
             Name = cluster.Name,
             Description = cluster.Description,
-            AdminNames = [.. dbContext.ClusterAdmins
-                .AsNoTracking()
-                .Where(ca => ca.ClusterId == cluster.Id)
-                .Include(ca => ca.Admin)
-                .Select(ca => ca.Admin.DisplayName)]
-        } : null;
+            AdminNames = [.. clusterAdmins.Select(ca => ca.Admin.DisplayName)],
+            ClusterAdmins = [.. clusterAdmins.Select(ca => new ClusterAdminDto
+            {
+                Id = ca.Id,
+                AdminId = ca.AdminId,
+                AdminDisplayName = ca.Admin.DisplayName
+            })]
+        };
 
         return clusterDto;
     }

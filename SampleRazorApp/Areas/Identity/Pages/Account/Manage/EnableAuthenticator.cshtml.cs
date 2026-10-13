@@ -129,7 +129,7 @@ namespace SampleRazorApp.Areas.Identity.Pages.Account.Manage
             if (await _userManager.CountRecoveryCodesAsync(user) == 0)
             {
                 var recoveryCodes = await _userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
-                RecoveryCodes = recoveryCodes.ToArray();
+                RecoveryCodes = [.. recoveryCodes];
                 return RedirectToPage("./ShowRecoveryCodes");
             }
             else

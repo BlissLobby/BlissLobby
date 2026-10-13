@@ -1,0 +1,92 @@
+@page "/Clusters/Admins/Delete/{Id}"
+
+@using App.Clusters.Commands.DeleteClusterAdmin
+@using App.Clusters.Queries.GetClusterAdminForDisplay
+@using Web.Services
+
+@inject IMediator mediator
+@inject RedirectManager RedirectManager
+
+<PageTitle>Delete Cluster Admin</PageTitle>
+
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="rz-mb-4">
+    Delete Cluster Admin
+</RadzenText>
+
+@if (Input is null)
+{
+    <p>Please wait...</p>
+}
+else
+{
+    <RadzenCard Class="rz-my-6 rz-mx-auto" Style="max-width: 600px;">
+        <RadzenAlert AlertStyle="AlertStyle.Warning" Variant="Variant.Flat" Shade="Shade.Lighter" AllowClose="false" Class="rz-mb-4">
+            <RadzenText TextStyle="TextStyle.Body2">
+                Are you sure you want to remove this user as an administrator of the cluster?
+            </RadzenText>
+        </RadzenAlert>
+
+        <RadzenStack Gap="1rem" Class="rz-mb-4">
+            <div>
+                <RadzenText TextStyle="TextStyle.Overline" Class="rz-display-flex rz-mt-2 rz-mb-0">Cluster</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body1"><b>@Input.ClusterName</b></RadzenText>
+            </div>
+            <div>
+                <RadzenText TextStyle="TextStyle.Overline" Class="rz-display-flex rz-mt-2 rz-mb-0">Admin</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body1"><b>@Input.AdminDisplayName</b></RadzenText>
+            </div>
+        </RadzenStack>
+
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem" JustifyContent="JustifyContent.End" AlignItems="AlignItems.Center">
+            <EditForm Enhance Model="Input" method="post" OnSubmit="HandleDelete" FormName="deleteClusterAdmin">
+                <InputHidden @bind-Value="Input.Id" Name="Input.Id" />
+                <RadzenButton ButtonType="ButtonType.Submit"
+                              Text="Delete Cluster Admin"
+                              ButtonStyle="ButtonStyle.Danger"
+                              Size="ButtonSize.Large" />
+            </EditForm>
+        </RadzenStack>
+    </RadzenCard>
+}
+
+@if (Input is not null)
+{
+    <p><a href="/Clusters/Edit/@Input.ClusterId">Back to Cluster</a></p>
+}
+
+@code {
+    [Parameter] public required string Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private ClusterAdminDisplayDto Input { get; set; } = default!;
+
+    private async Task HandleDelete()
+    {
+        var result = await mediator.Send(new DeleteClusterAdminCommand(Input.Id));
+        if (result)
+        {
+            RedirectManager.RedirectToWithStatus(
+                $"/Clusters/Edit/{Input.ClusterId}",
+                $"Removed '{Input.AdminDisplayName}' as a cluster admin",
+                Radzen.AlertStyle.Success);
+        }
+        else
+        {
+            RedirectManager.RedirectToWithStatus(
+                "/Error",
+                "An error occurred while deleting the cluster admin.",
+                Radzen.AlertStyle.Danger);
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var clusterAdmin = await mediator.Send(new GetClusterAdminForDisplayQuery(Id));
+        if (clusterAdmin == null)
+        {
+            RedirectManager.RedirectTo("/not-found", true);
+            return;
+        }
+        Input = clusterAdmin;
+    }
+}

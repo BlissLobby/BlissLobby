@@ -51,8 +51,8 @@ else
                           ButtonStyle="ButtonStyle.Secondary" 
                           Size="ButtonSize.Large" />
             <EditForm Enhance Model="Input" method="post" OnSubmit="HandleDelete" FormName="deleteBuilding">
-                <InputHidden @bind-Value="Input.Id" Name="Building.Id" />
-                <InputHidden @bind-Value="Input.Name" Name="Building.Name" />
+                <InputHidden @bind-Value="Input.Id" Name="Input.Id" />
+                <InputHidden @bind-Value="Input.Name" Name="Input.Name" />
                 <RadzenButton ButtonType="ButtonType.Submit" 
                               Text="Delete Building" 
                               ButtonStyle="ButtonStyle.Danger" 
