@@ -217,7 +217,7 @@ else
         }
 
         Buildings = (await mediator.Send(new GetBuildingsQuery()))
-                                    .Append(new Building() { Id = "", Name = "Select a Building..." }).ToList();
+                                    .Prepend(new Building() { Id = "", Name = "Select a Building..." }).ToList();
 
         editContext = new EditContext(Input);
         messageStore = new ValidationMessageStore(editContext);
